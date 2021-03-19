@@ -20,21 +20,25 @@ pipeline {
             }
 
             stage("Deploy to Dynatrace") {
-                     createDynatraceDeploymentEvent(
+                steps {
+                      createDynatraceDeploymentEvent(
                           envId: 'dynatrace',
                           tagMatchRules: [[meTypes: [[meType: 'PROCESS_GROUP']],
                            tags: [[context: 'CONTEXTLESS',
                            key: '', value: 'frontend']]]])
-                     }
+                }
+            }
 
            stage("Performance Test") {
-                            recordDynatraceSession(
+                steps{
+                      recordDynatraceSession(
                             entityIds: [[$class: 'Host',
                             entityId: 'HOST-BD218C0C2D961C58']],
                             envId: 'dynatrace',
                             testCase: 'loadtest'){
                               perfSigDynatraceReports envId: 'dynatrace', nonFunctionalFailure: 2, specFile: 'specfile.json'
                             }
+               }
           }
 
     }
